@@ -1,6 +1,7 @@
 import User from '../models/userModel.js';
 import bcryptjs from 'bcryptjs';
 import { errorHandler } from '../utils/error.js';
+import jwt from 'jsonwebtoken'
 export const signup = async (req, res, next) => {
     const { username, email, password } = req.body;
     console.log(req.body);
@@ -24,21 +25,36 @@ export const signup = async (req, res, next) => {
 }
 
 export const login = async (req, res, next) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
     try {
-        if (!username || !password) {
-            next(errorHandler(400, 'Invalid username or password'));
-        }
-        const user = await User.findOne({ username });
-        if (!user) {
-            next(errorHandler(400, 'Invalid username or password'));
-        }
-        const isMatch = bcryptjs.compareSync(password, user.password);
-        if (!isMatch) {
+        if (!email || !password || email === '' || password === '') {
             next(errorHandler(400, 'Invalid username or password'));
         }
 
-        res.status(200).json(user)
+        try {
+            const user = await User.findOne({ email });
+            if (!user) {
+                next(errorHandler(400, 'Invalid username'));
+            }
+            const isMatch = bcryptjs.compareSync(password, user.password);
+            if (!isMatch) {
+                next(errorHandler(400, 'Invalid  password'));
+            }
+
+            const token = jwt.sign(
+                { id: user._id }, process.env.JWT_SECRET, { expiresIn: '6h' });
+
+            const { password: pass, ...others } = user._doc
+
+            res.status(200).cookie('access_token', token, {
+                httpOnly: true,
+            }).json(others)
+
+            // res.status(200).json(user)
+        } catch (error) {
+            next(error)
+        }
+
     } catch (err) {
         next(err)
     }
