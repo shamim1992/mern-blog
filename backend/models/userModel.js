@@ -19,7 +19,11 @@ const UserSchema = new mongoose.Schema({
     profilePicture: {
         type: String,
         default: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
-    }
+    },
+    isAdmin: {
+        type: Boolean,
+        default: false,
+    },
 }, { timestamps: true });
 
 const User = mongoose.model('User', UserSchema);
