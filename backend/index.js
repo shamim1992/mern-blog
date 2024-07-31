@@ -5,6 +5,7 @@ import cors from 'cors';
 import userRoutes from './routes/userRoute.js';
 import authRoutes from './routes/userAuth.js';
 import postRoutes from './routes/postRoute.js';
+import commentRoutes from './routes/commentRoute.js';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -23,8 +24,11 @@ app.use((err, req, res, next) => {
         success: false, statusCode, message
     });
 });
-
+// app.use('/', (req, res) => {
+//     res.send("server is running")
+// })
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/post', postRoutes);
+app.use('/api/comment', commentRoutes);
 app.listen(process.env.PORT, () => console.log('Connected to', process.env.PORT));
